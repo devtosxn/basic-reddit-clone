@@ -1,7 +1,7 @@
 from rest_framework import permissions
 
 
-class IsAuthorOrReadOnly(permissions.BasePermission):
+class IsPostAuthorOrReadOnly(permissions.BasePermission):
     """Only the author of the post can perform write operations on post instances"""
 
     def has_object_permission(self, request, view, obj):

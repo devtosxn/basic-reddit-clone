@@ -3,7 +3,7 @@ from rest_framework import generics, status, permissions, mixins
 
 from .models import Post, Vote
 from .serializers import PostSerializer, VoteSerializer
-from .permissions import IsAuthorOrReadOnly
+from .permissions import IsPostAuthorOrReadOnly
 
 from helpers.response import Response
 
@@ -31,7 +31,7 @@ class PostView(generics.ListCreateAPIView):
 
 class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PostSerializer
-    permission_classes = (permissions.IsAuthenticated, IsAuthorOrReadOnly)
+    permission_classes = (permissions.IsAuthenticated, IsPostAuthorOrReadOnly)
     queryset = Post.objects.all()
     lookup_url_kwarg = 'id'
     lookup_field = 'id'
