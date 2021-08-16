@@ -1,5 +1,5 @@
 from rest_framework.authentication import TokenAuthentication
-from rest_framework import generics, status, permissions, exceptions
+from rest_framework import generics, status, permissions, mixins
 
 from .models import Post, Vote
 from .serializers import PostSerializer, VoteSerializer
@@ -64,7 +64,7 @@ class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
         return Response(data={'data': {}}, status=status.HTTP_204_NO_CONTENT)
 
 
-class VoteView(generics.CreateAPIView):
+class VoteView(generics.CreateAPIView, mixins.DestroyModelMixin):
     serializer_class = VoteSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -84,3 +84,9 @@ class VoteView(generics.CreateAPIView):
         if serializer.is_valid():
             self.perform_create(serializer)
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+
+    def delete(self, request, *args, **kwargs):
+        if self.get_queryset().exists():
+            self.get_queryset().delete()
+            return Response(data={'detail': 'vote deleted'}, status=status.HTTP_204_NO_CONTENT)
+        return Response(errors={'detail': 'you have not voted for this post'}, status=status.HTTP_400_BAD_REQUEST)
