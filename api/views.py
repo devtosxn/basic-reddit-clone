@@ -62,3 +62,24 @@ class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
         instance = self.get_object()
         self.perform_destroy(instance)
         return Response(data={'data': {}}, status=status.HTTP_204_NO_CONTENT)
+
+
+class VoteView(generics.CreateAPIView):
+    serializer_class = VoteSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        voter = self.request.user
+        post = Post.objects.get(id=self.kwargs['id'])
+        return Vote.objects.filter(voter=voter, post=post)
+
+    def perform_create(self, serializer):
+        post = Post.objects.get(id=self.kwargs['id'])
+        serializer.save(voter=self.request.user, post=post)
+
+    # def create(self, request, *args, **kwargs):
+    #     serializer = VoteSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         self.perform_create(serializer)
+    #         return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+    #     return Response(errors=serializer.errors, status=status.HTTP_400_BAD_REQUEST)

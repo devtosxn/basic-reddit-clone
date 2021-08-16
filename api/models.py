@@ -24,4 +24,4 @@ class Vote(models.Model):
     voter = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.post.title + ": " + self.user.username
+        return self.id
