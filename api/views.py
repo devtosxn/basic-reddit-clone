@@ -76,3 +76,10 @@ class VoteView(generics.CreateAPIView):
     def perform_create(self, serializer):
         post = Post.objects.get(id=self.kwargs['id'])
         serializer.save(voter=self.request.user, post=post)
+
+    def create(self, request, *args, **kwargs):
+        serializer = VoteSerializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+        return Response(errors=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
