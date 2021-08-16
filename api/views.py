@@ -3,14 +3,14 @@ from rest_framework import generics, status, permissions, mixins
 
 from .models import Post, Vote
 from .serializers import PostSerializer, VoteSerializer
+from .permissions import IsAuthorOrReadOnly
 
 from helpers.response import Response
 
 
 class PostView(generics.ListCreateAPIView):
     serializer_class = PostSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
     queryset = Post.objects.all()
 
     def perform_create(self, serializer):
@@ -31,8 +31,7 @@ class PostView(generics.ListCreateAPIView):
 
 class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PostSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated, IsAuthorOrReadOnly)
     queryset = Post.objects.all()
     lookup_url_kwarg = 'id'
     lookup_field = 'id'
@@ -61,7 +60,7 @@ class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         self.perform_destroy(instance)
-        return Response(data={'data': {}}, status=status.HTTP_204_NO_CONTENT)
+        return Response(data={'detail': 'post deleted'}, status=status.HTTP_204_NO_CONTENT)
 
 
 class VoteView(generics.CreateAPIView, mixins.DestroyModelMixin):
