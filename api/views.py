@@ -1,5 +1,5 @@
 from rest_framework.authentication import TokenAuthentication
-from rest_framework import generics, status, permissions
+from rest_framework import generics, status, permissions, exceptions
 
 from .models import Post, Vote
 from .serializers import PostSerializer, VoteSerializer
@@ -79,7 +79,8 @@ class VoteView(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         serializer = VoteSerializer(data=request.data)
+        if self.get_queryset().exists():
+            return Response(errors={'detail': 'you have already voted for this post'}, status=status.HTTP_400_BAD_REQUEST)
         if serializer.is_valid():
             self.perform_create(serializer)
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
-        return Response(errors=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
