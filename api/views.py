@@ -65,7 +65,7 @@ class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class VoteView(generics.CreateAPIView, mixins.DestroyModelMixin):
     serializer_class = VoteSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
         voter = self.request.user
